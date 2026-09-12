@@ -1,5 +1,6 @@
 package com.horncoder.myprofile.ui.profile
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +27,7 @@ import coil.compose.AsyncImage
 import com.horncoder.myprofile.model.response.GithubUser
 
 @Composable
-fun GithubUsersScreen(viewModel: GithubUsersViewModel = viewModel()) {
+fun GithubUsersScreen(onUserClick: (String) -> Unit, viewModel: GithubUsersViewModel = viewModel()) {
 
     val uiState by viewModel.uiState.collectAsState()
 
@@ -48,13 +49,13 @@ fun GithubUsersScreen(viewModel: GithubUsersViewModel = viewModel()) {
         }
 
         is GithubUiState.Success -> {
-            UserList(state.data)
+            UserList(onUserClick = onUserClick ,state.data)
         }
     }
 }
 
 @Composable
-fun UserList(data: List<GithubUser>) {
+fun UserList(onUserClick: (String) -> Unit, data: List<GithubUser>) {
     LazyColumn {
         items(data) { user ->
             Card(
@@ -63,6 +64,9 @@ fun UserList(data: List<GithubUser>) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
+                    .clickable{
+                        onUserClick(user.login)
+                    }
 
             ){
 
