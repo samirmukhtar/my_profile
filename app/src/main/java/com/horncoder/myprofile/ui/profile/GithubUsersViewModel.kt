@@ -25,21 +25,14 @@ private val repository = GithubRepository(RetrofitInstance.api)
 
     fun getUsers() {
         viewModelScope.launch {
-            Log.d("Test", "testing...")
-//            Log.d("Test", repository.getUsers().toString())
             _uiState.value = GithubUiState.Loading
             try {
                 val users = repository.getUsers()
-//            Log.d("Test", users.toString())
-
                 _uiState.value = GithubUiState.Success(users)
             }
             catch (e: Exception){
                 _uiState.value = GithubUiState.Error(e.message ?: "something went wrong!")
-//                Log.d("Test", repository.getUsers().toString())
-
             }
         }
     }
-
 }

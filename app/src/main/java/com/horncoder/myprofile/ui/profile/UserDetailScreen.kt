@@ -16,6 +16,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -24,18 +25,22 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.horncoder.myprofile.model.response.GithubUser
+import com.horncoder.myprofile.model.response.GithubUserDetail
 
 @Composable
-fun GithubUsersScreen(viewModel: GithubUsersViewModel = viewModel()) {
+fun UserDetailScreen(username: String, viewModel: UserDetailViewModel = viewModel()) {
 
+    LaunchedEffect(username) {
+        viewModel.getUserDetail(username)
+    }
     val uiState by viewModel.uiState.collectAsState()
 
     when (val state = uiState) {
-        is GithubUiState.Error -> {
+        is UserDetailUiState.Error -> {
             Text(text = state.message)
         }
 
-        GithubUiState.Loading -> {
+        UserDetailUiState.Loading -> {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -47,46 +52,34 @@ fun GithubUsersScreen(viewModel: GithubUsersViewModel = viewModel()) {
             }
         }
 
-        is GithubUiState.Success -> {
-            UserList(state.data)
+        is UserDetailUiState.Success -> {
+            UserDetail(state.data)
         }
     }
 }
 
 @Composable
-fun UserList(data: List<GithubUser>) {
-    LazyColumn {
-        items(data) { user ->
-            Card(
-                shape = RoundedCornerShape(8.dp),
-                elevation = CardDefaults.cardElevation(2.dp),
+fun UserDetail(user: GithubUserDetail) {
+    Column {
+        Row {
+            AsyncImage(
+                model = user.avatarUrl,
+                contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
+                    .padding(4.dp)
+                    .size(88.dp)
+            )
+            Column(
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(16.dp)
 
-            ){
+            ) {
+                Text(
+                    text = user.login,
+                    style = MaterialTheme.typography.titleSmall
 
-                Row {
-                    AsyncImage(
-                        model = user.avatarUrl,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .size(88.dp)
-                    )
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .padding(16.dp)
-
-                    ) {
-                        Text(
-                            text = user.login,
-                            style = MaterialTheme.typography.titleSmall
-
-                        )
-                    }
-                }
+                )
             }
         }
     }
